@@ -1,3 +1,4 @@
+import { DiasDaSemana } from "../enums/dias-da-semana.js";
 import { Negociacao } from "../models/negociacao.js";
 import { Negociacoes } from "../models/negociacoes.js"
 import { mensagemView } from "../views/mensagem-view.js";
@@ -8,36 +9,41 @@ export class NegociacaoController {
     private inputQuantidade: HTMLInputElement;
     private inputValor: HTMLInputElement;
     private negociacoes = new Negociacoes();
-    private negociacoesView = new NegociacoesView('#negociaciesView');
+    private negociacoesView = new NegociacoesView('#negociaciesView', true);
     private mensagemView = new mensagemView('#mesagemView');
+    private readonly DOMINGO = 0;
+    private readonly SABADO = 6;
 
+    //Utilizar castning explicito "as HTMLInputElement" devido ao parâmetro strictNullChecks no tsconfig.json estar como true
     constructor() {
-        this.inputData = document.querySelector('#data');
-        this.inputQuantidade = document.querySelector('#quantidade');
-        this.inputValor = document.querySelector('#valor');
+        this.inputData = document.querySelector('#data') as HTMLInputElement;
+        this.inputQuantidade = document.querySelector('#quantidade') as HTMLInputElement;
+        this.inputValor = document.querySelector('#valor') as HTMLInputElement;
         this.negociacoesView.update(this.negociacoes);
     }
 
     public adiciona() : void {
-        const negociacao = this.criaNegociacao();
-        if (negociacao.data.getDay() > 0 && negociacao.data.getDay() < 7) {
-            this.negociacoes.adiciona(negociacao);
-            this.limparFormulario();
-            this.AtualizaView();
+        const negociacao = Negociacao.criaDe(
+            this.inputData.value,
+            this.inputQuantidade.value,
+            this.inputValor.value
+        );
+        if (!this.DiaUtil(negociacao.data)) {
+            this.mensagemView
+                .update('Apenas negociações em dias úteis são aceitas.')
+            return;
         }
         this.negociacoes.adiciona(negociacao);
         this.limparFormulario();
         this.AtualizaView();
     }
-    
-    private criaNegociacao(): Negociacao {
-        const exp = /-/g; //expressão regular para encontrar o hífen
-        const date = new Date(this.inputData.value.replace(exp, ',')); //substituindo o hífen por vírgula no formato data utlizando expressao regular
-        const quantidade = parseInt(this.inputQuantidade.value);
-        const valor = parseFloat(this.inputValor.value);
-        return new Negociacao(date, quantidade, valor);
 
+    /*Método para validação de dia útil*/
+    private DiaUtil(data: Date ) {
+        return data.getDay() > DiasDaSemana.DOMINGO && data.getDay() < DiasDaSemana.SABADO; 
+        
     }
+
 
     private limparFormulario(): void {
         this.inputData.value = '';
@@ -51,5 +57,4 @@ export class NegociacaoController {
         this.negociacoesView.update(this.negociacoes);
         this.mensagemView.update('Negociação adicionada com sucesso!')
     }
-
 }
