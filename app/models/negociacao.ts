@@ -15,4 +15,12 @@ export class Negociacao {
         const data = new Date(this._data.getTime());
         return this._data;
     }
+
+    public static criaDe(dataString: string, quantidadeString: string, valorString: string) {
+        const exp = /-/g; //expressão regular para encontrar o hífen
+        const date = new Date(dataString.replace(exp, ',')); //substituindo o hífen por vírgula no formato data utlizando expressao regular
+        const quantidade = parseInt(quantidadeString);
+        const valor = parseFloat(valorString);
+        return new Negociacao(date, quantidade, valor);
+    }
 }
