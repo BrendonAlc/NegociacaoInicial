@@ -1,11 +1,11 @@
 {
     "compilerOptions": {
-        "outDir": "dist/js",
+        "outDir": "./app/dist/js", //pasta de saída
         "target": "ES6",
         "noEmitOnError": true,
         "noImplicitAny": true,
         "removeComments": true, //remover comentários no JS compilado
-        "strictNullChecks": true
+        "strictNullChecks": true //retirando para que qualquer tipo possa receber null
     },
     "include": ["app/**/*"]
 }
